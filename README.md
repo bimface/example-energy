@@ -7,7 +7,7 @@
 
 # 主要逻辑
 
-通过BIMFACE前端JavaScript API灵活使用构建能源管理应用场景。
+通过BIMFACE前端JavaScript API灵活使用构建能耗管理应用场景。
 
 # 前端实现
 
