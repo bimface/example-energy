@@ -3,7 +3,7 @@
 基于BIMFACE的拓展功能，可以对接一些空调设备、能源检测的传感器，以此达到BIM+物联网的功能。选中某一个设备的时候，可以实时显示设备的数据信息，同时也可以远程操控设备。
 
 # 效果图
-![view](resources/img/view.jpg)
+![view](resources/img/view.png)
 
 # 主要逻辑
 
