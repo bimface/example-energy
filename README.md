@@ -58,21 +58,58 @@ console.log(error);
 };
 
 ```
-## JDSDK对象
-  * 箭头
+## 用到的JSSDK方法
+  * 改变构件颜色
 ```javascript
-annotationManager.setAnnotationType(Glodon.Bimface.Plugins.Annotation.AnnotationTypeOption.Arrow);
+let modeColor = new Glodon.Web.Graphics.Color(0,255,0,100);
+viewer3D.overrideComponentsColorById(me.componentsColor,modeColor);
 ```		
-  * 矩形
+  * 还原构件颜色
 ```javascript
-annotationManager.setAnnotationType(Glodon.Bimface.Plugins.Annotation.AnnotationTypeOption.Rectangle);
+viewer3D.restoreComponentsColorById(me.componentsColor);
+```
+  * 添加标签以及标签操作
+```javascript
+//循环标签数组
+for(let i=0;i<me.tagArray.length;i++){
+  if(me.tagArray[i].isOn){
+    //获取构件属性
+    viewer3D.getComponentProperty(me.tagArray[i].id,function(data){
+      let _worldPosition = new Object();
+      _worldPosition.x = (data.boundingBox.max.x + data.boundingBox.min.x)/2;
+      _worldPosition.y = (data.boundingBox.max.y + data.boundingBox.min.y)/2;
+      _worldPosition.z = (data.boundingBox.max.z + data.boundingBox.min.z)/2;
+      
+      //配置自定义标签
+      var config = new Glodon.Bimface.Plugins.Drawable.CustomItemConfig();
+      var circle = document.createElement('div');
+      circle.className = 'bln';
+      config.content = circle;
+      config.viewer = window.viewer3D;
+      config.index = i;
+      config.worldPosition = _worldPosition;
+
+      //生成customItem实例
+      var customItem = new Glodon.Bimface.Plugins.Drawable.CustomItem(config);
+      //标签点击事件
+      customItem.onClick(function(item) {
+        me.selectTag(item._config.index);
+        viewer3D.zoomToBoundingBox(data.boundingBox);
+      });
+
+      me.tagList.push(customItem);
+    })
+  }
+}
+//添加标签
+drawableContainer.addItems(me.tagList);
 ```
 
 ## 显示实时耗电量的折线图
 
 基于highcharts进行开发
 
-
+## 注
 
 ps. 改Demo基于vue+webpack进行开发打包，如用jquery/React实现同上。
 
