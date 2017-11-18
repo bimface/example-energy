@@ -1,0 +1,401 @@
+<template>
+  <div id="app">
+    <div class="container">
+      <div id="view3d"></div>
+      <div class="side" v-show="loaded">
+        <ul class="list" :style="{'height':cHeight}">
+          <li v-for="(item,i) in tagArray" :class="{'cur':item.isCheck}" @click="showBoard(i)">{{item.name}}</li>
+        </ul>
+
+        <ul class="info" :class="{'off':!switchBtn}">
+          <li>{{infoBox.co}}</li>
+          <li>{{infoBox.tvoc}}</li>
+          <li>{{infoBox.pm25}}</li>
+          <li>
+            <span v-if="infoBox.t<28">{{infoBox.t}}</span>
+            <span class="yellow" v-if="infoBox.t>27 && infoBox.t<32">{{infoBox.t}}</span>
+            <span class="red" v-if="infoBox.t>31">{{infoBox.t}}</span>
+          </li>
+          <li>{{infoBox.h}}</li>
+          <li>{{infoBox.pm}}</li>
+        </ul>
+
+        <div class="btn-box">
+          <span class="switch" @click="btnSwitch"></span>
+          <span class="up" @click="btnUp"></span>
+          <span class="down" @click="btnDown"></span>
+        </div>
+
+        <div class="energy">
+          实时耗电量
+          <div id="energy" data-highcharts-chart="0"></div>
+        </div>
+
+        <div class="bottom">
+          <a href="https://github.com/bimface/example-energy" target="_blank" class="btn btn-sm btn-default">示例代码</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script>
+  import Vue from 'vue'
+  import '../../assets/css/btn.less'
+  import './less/energy.less'
+
+  export default {
+    data(){
+      return {
+        cHeight:null,
+        info:null,
+        switchBtn:false,
+        loaded:false,
+        tagArray:[{
+          isCheck:false,
+          isOn:true,
+          name:'总经理办公室',
+          id:1639053,
+          arr:[831512,831648,831511,831510,831632,831481,831480,831479,831477,831476,831475,831503,831474,831453,831644,831454,831455,831456,831457,831458,831459,831460,831506,831507,831508,831649,831509,1242435,838898,1280238],
+          info:{
+            co:800,
+            tvoc:0.2,
+            pm25:32,
+            t:24,
+            h:32,
+            pm:60
+          }
+        },{
+          isCheck:false,
+          isOn:true,
+          name:'财务部',
+          id:1630239,
+          arr:[831533,831532,831531,831530,831526,831529,831528,831527,831488,831489,831635,831490,831491,831492,831493,840866,831473,831472,831471,831470,831469,831502,831468,831467],
+          info:{
+            co:792,
+            tvoc:0.2,
+            pm25:32,
+            t:26,
+            h:32,
+            pm:60
+          }
+        },{
+          isCheck:false,
+          isOn:true,
+          name:'会议室',
+          id:1636188,
+          arr:[831199,831200,831201,831203,831204,831205,831206,831207,831208,831209,831210,831211,831247,831249,831250,831252,831253,831255,831256,831257,831258,831259,831261,831297,831298,831302,831303,831304,831305,831306,831308,831309,831310,831311,831338,831339,831340,831545,831546,831547,831548,831549,831550,831551,831552,831553,831554,831555,831556,831557,831558,831608,841228,841327,843654],
+          info:{
+            co:802,
+            tvoc:0.2,
+            pm25:32,
+            t:25,
+            h:33,
+            pm:60
+          }
+        },{
+          isCheck:false,
+          isOn:true,
+          name:'销售部',
+          id:1625158,
+          arr:[831274,831275,831276,831277,831278,831279,831280,831293,831300,831321,831322,831323,831324,831325,831326,831336,831337,831341,831569,831570,831571,831572,831573,831574,831575,831576,831577,831578],
+          info:{
+            co:798,
+            tvoc:0.2,
+            pm25:32,
+            t:26,
+            h:32,
+            pm:60
+          }
+        },{
+          isCheck:false,
+          isOn:true,
+          name:'采购部',
+          id:1634894,
+          arr:[831287,831288,831290,831294,831332,831333,831587,831588,831589,831590,831591,831616,831659,831660,844253,844402],
+          info:{
+            co:812,
+            tvoc:0.2,
+            pm25:32,
+            t:27,
+            h:36,
+            pm:60
+          }
+        }],
+        componentsColor:[],
+        tagList:[],
+        infoBox:{
+          co:0,
+          tvoc:0,
+          pm25:0,
+          t:0,
+          h:0,
+          pm:0
+        }
+      }
+    },
+
+    mounted(){
+      var  me = this;
+
+      me.cHeight = (document.documentElement.clientHeight - 475) + 'px';
+
+      me.$http.get('http://bimface.com/console/share/preview/viewtoken?token=4b042b5d').then((res)=>{
+        if(res.data.code == 'success'){
+          var viewToken = res.data.data;
+
+          var options = new BimfaceSDKLoaderConfig();
+          options.viewToken = viewToken;
+          BimfaceSDKLoader.load(options, successCallback, failureCallback);
+
+          function successCallback() {
+            // 获取DOM元素
+            var dom4Show = document.getElementById('view3d');
+            var webAppConfig = new Glodon.Bimface.Application.WebApplication3DConfig();
+            webAppConfig.domElement = dom4Show;
+
+            // 创建WebApplication
+            window.app = new Glodon.Bimface.Application.WebApplication3D(webAppConfig);
+
+            // 添加待显示的模型
+            app.addView(viewToken);
+
+            // 监听添加view完成的事件
+            app.addEventListener(Glodon.Bimface.Application.WebApplication3DEvent.ViewAdded, function () {
+
+              // 从WebApplication获取viewer3D对象
+              window.viewer3D = app.getViewer();
+
+              app.render();
+              me.loaded = true;
+
+              // 初始化DrawableContainer
+              var drawableConfig = new Glodon.Bimface.Plugins.Drawable.DrawableContainerConfig();
+              drawableConfig.viewer = window.viewer3D;
+              window.drawableContainer = new Glodon.Bimface.Plugins.Drawable.DrawableContainer(drawableConfig);
+
+              me.updataTag();
+            });
+
+          };
+          function failureCallback(error) {
+            console.log(error);
+          };
+
+        }
+      })
+
+      $('#energy').highcharts({
+        chart: {
+          type: 'spline',
+          animation: Highcharts.svg, // don't animate in old IE
+          backgroundColor:'#333333',
+          events: {
+            load: function() {
+              // set up the updating of the chart each second
+              var series = this.series[0];
+              setInterval(function() {
+                var x = (new Date()).getTime(), // current time
+                        y = Math.random();
+                series.addPoint([x, y], true, true);
+              }, 500);
+            }
+          }
+        },
+        plotOptions: {
+          spline: {
+            lineWidth: 1.5,
+            fillOpacity: 0.1,
+            marker: {
+              enabled: false,
+              states: {
+                hover: {
+                  enabled: true,
+                  radius: 2
+                }
+              }
+            },
+            shadow: false
+          }
+        },
+        colors: ['#68a526'],
+        credits:{
+          enabled:false
+        },
+        title: {
+          text: null
+        },
+        xAxis: {
+          gridLineColor:'#5d5d5d',
+          gridLineWidth:1,
+          lineColor:'#5d5d5d',
+          labels: {
+            enabled: false
+          }
+        },
+        yAxis: {
+          title: {
+            text: null
+          },
+          gridLineColor:'#5d5d5d',
+          gridLineWidth:1,
+          labels: {
+            enabled: false
+          }
+        },
+        tooltip: {
+          formatter: function() {
+            return '<b>'+ this.series.name +'</b><br/>'+
+                    Highcharts.dateFormat('%H:%M:%S', this.x) +'<br/>'+
+                    Highcharts.numberFormat(this.y, 2);
+          }
+        },
+        legend: {
+          enabled: false
+        },
+        exporting: {
+          enabled: false
+        },
+        series: [{
+          name: '实时耗电量',
+          data: (function() {
+            // generate an array of random data
+            var data = [],
+                time = (new Date()).getTime(),
+                i;
+
+            for (i = -10; i <= 0; i++) {
+              data.push({
+                x: time + i * 1000,
+                y: Math.random()
+              });
+            }
+            return data;
+          })()
+        }]
+      })
+    },
+
+    methods: {
+      showBoard: function(num){
+        this.selectTag(num);
+      },
+
+      selectTag: function(num){
+        var me = this;
+        me.reset();
+        me.tagArray[num].isCheck = true;
+        viewer3D.restoreComponentsColorById(me.componentsColor);
+        if(this.tagArray[num].isOn){
+          me.switchBtn = true;
+          me.infoBox = me.tagArray[num].info;
+          me.componentsColor = me.tagArray[num].arr;
+          let modeColor = new Glodon.Web.Graphics.Color(0,255,0,100);
+          viewer3D.overrideComponentsColorById(me.componentsColor,modeColor);
+        } else {
+          me.switchBtn = false;
+          this.infoBox = {
+            co:0,
+            tvoc:0,
+            pm25:0,
+            t:0,
+            h:0,
+            pm:0
+          };
+        }
+        app.render();
+      },
+
+      updataTag: function(){
+        var me = this;
+        me.tagList = [];
+        for(let i=0;i<me.tagArray.length;i++){
+          if(me.tagArray[i].isOn){
+            viewer3D.getComponentProperty(me.tagArray[i].id,function(data){
+              let _worldPosition = new Object();
+              _worldPosition.x = (data.boundingBox.max.x + data.boundingBox.min.x)/2;
+              _worldPosition.y = (data.boundingBox.max.y + data.boundingBox.min.y)/2;
+              _worldPosition.z = (data.boundingBox.max.z + data.boundingBox.min.z)/2;
+
+              var config = new Glodon.Bimface.Plugins.Drawable.CustomItemConfig();
+              var circle = document.createElement('div');
+              circle.className = 'bln';
+              config.content = circle;
+              config.viewer = window.viewer3D;
+              config.index = i;
+              config.worldPosition = _worldPosition;
+
+              //生成customItem实例
+              var customItem = new Glodon.Bimface.Plugins.Drawable.CustomItem(config);
+              customItem.onClick(function(item) {
+                me.selectTag(item._config.index);
+                viewer3D.zoomToBoundingBox(data.boundingBox);
+              });
+
+              me.tagList.push(customItem);
+            })
+          }
+        }
+        drawableContainer.addItems(me.tagList);
+      },
+
+      reset:function(){
+        var me = this;
+        for(let i=0;i<me.tagArray.length;i++){
+          me.tagArray[i].isCheck = false;
+        }
+      },
+
+      btnSwitch:function(){
+        for(let i=0;i<this.tagArray.length;i++){
+          if(this.tagArray[i].isCheck){
+            viewer3D.restoreComponentsColorById(this.componentsColor);
+            if(this.tagArray[i].isOn){
+              //关闭
+              this.switchBtn = false;
+              this.tagArray[i].isOn = false;
+              this.infoBox = {
+                co:0,
+                tvoc:0,
+                pm25:0,
+                t:0,
+                h:0,
+                pm:0
+              };
+            } else {
+              //打开
+              this.switchBtn = true;
+              this.tagArray[i].isOn = true;
+              this.infoBox = {
+                co:this.tagArray[i].info.co,
+                tvoc:this.tagArray[i].info.tvoc,
+                pm25:this.tagArray[i].info.pm25,
+                t:this.tagArray[i].info.t,
+                h:this.tagArray[i].info.h,
+                pm:this.tagArray[i].info.pm
+              };
+              this.componentsColor = this.tagArray[i].arr;
+              let modeColor = new Glodon.Web.Graphics.Color(0,255,0,100);
+              viewer3D.overrideComponentsColorById(this.componentsColor,modeColor);
+            }
+            this.updataTag();
+            app.render();
+          }
+        }
+      },
+
+      btnUp: function(){
+        if(this.switchBtn && this.infoBox.t<36){
+          this.infoBox.t++;
+        }
+      },
+
+      btnDown: function(){
+        if(this.switchBtn && this.infoBox.t>18){
+          this.infoBox.t--;
+        }
+      }
+    }
+  }
+</script>
