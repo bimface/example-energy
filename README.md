@@ -94,7 +94,7 @@ for(let i=0;i<me.tagArray.length;i++){
       //标签点击事件
       customItem.onClick(function(item) {
         me.selectTag(item._config.index);
-        viewer3D.zoomToBoundingBox(data.boundingBox);
+        viewer3D.setCameraStatus(me.tagArray[i].cameraStatus);
       });
 
       me.tagList.push(customItem);
