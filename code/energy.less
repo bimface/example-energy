@@ -1,0 +1,141 @@
+.container {
+  position: relative;
+  margin:20px;
+  box-shadow: 0 0 5px 0 #eee;
+  background-color: #fff;
+  .side {
+    position: absolute;
+    top:0px;
+    right:0px;
+    bottom:0px;
+    width: 240px;
+    background-color: #f4f4f4;
+    border-left:1px solid #ccc;
+    box-sizing: border-box;
+    .list {
+      padding:10px;
+      border-bottom:1px solid #ccc;
+      overflow: hidden;
+      li {
+        padding:5px 10px;
+        cursor: pointer;
+        &.cur {
+          background-color: #c6efe8;
+          color:#1bcbad;
+        }
+      }
+    }
+    .info {
+      width:218px;
+      height: 138px;
+      border:1px solid #ccc;
+      background: url(../img/exmaple-energy-info.png) no-repeat;
+      margin: 10px 0 10px 9px;
+      &.off {
+        li {
+          color:#ccc;
+        }
+      }
+      li {
+        float: left;
+        width: 72px;
+        height: 69px;
+        text-align: center;
+        padding-top: 18px;
+        box-sizing: border-box;
+        font-size: 22px;
+        color:#16ae11;
+        .yellow {
+          color:#ff8023;
+        }
+        .red {
+          color:#ff2323;
+        }
+      }
+    }
+    .btn-box {
+      overflow: hidden;
+      margin: 0 10px 10px;
+      span {
+        float: left;
+        margin-right:10px;
+        border:1px solid #979797;
+        height:30px;
+        border-radius: 4px;
+        width:64px;
+        cursor: pointer;
+        &:last-child {
+          width:65px;
+          margin-right:0;
+        }
+        &:hover {
+          background-color: #e7e7e7;
+        }
+        &.switch {
+          background-image: url(../img/on-off.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+        &.down {
+          background-image: url(../img/arrow-down.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+        &.up {
+          background-image: url(../img/arrow-up.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+        }
+      }
+    }
+    .energy {
+      border-top:1px solid #ccc;
+      padding:10px;
+    }
+  }
+}
+
+.btn-sm {
+  height: 28px;
+}
+
+
+#view3d {
+  position: absolute;
+  top:0;
+  left:0;
+  right:240px;
+  bottom:0px;
+}
+
+.energy-charts {
+  width:220px;
+  height: 100px;
+  margin: 10px 0;
+  background-color: #000;
+}
+
+.bln {
+  width: 20px;
+  height: 20px;
+  border: 4px solid rgba(255, 140, 0, 1);
+  border-radius:100%;
+  background-color: rgba(255, 140, 0, 0.3);
+  cursor: pointer;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-name: breathe;
+  -webkit-animation-duration: 2000ms;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+}
+@-webkit-keyframes breathe {
+  0% {
+    transform: scale(0.2);
+  }
+  80% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
