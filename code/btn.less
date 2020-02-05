@@ -1,0 +1,90 @@
+.btn{
+  display:inline-block;
+  text-align:center;
+  border:none;
+  border-radius:3px;
+  outline:none;
+  text-decoration:none;
+  box-sizing: border-box;
+  cursor:pointer;
+  &:hover{
+    text-decoration:none;
+  }
+  &.btn-primary{
+    background:#11dab7;
+    color:#fff;
+    &:hover{
+      background:#0feac3;
+    }
+  }
+  &.btn-default{
+    background:transparent;
+    color:#11dab7;
+    border:1px solid #11dab7;
+    &:hover{
+      color:#0feac3;
+      border:1px solid #0feac3;
+    }
+  }
+  &.btn-disable{
+    background:#eee;
+    color:#ccc;
+    border:1px solid #ccc;
+    cursor: default;
+    &:hover{
+      color:#ccc;
+      border:1px solid #ccc;
+    }
+  }
+  &.btn-disable2{
+    background:#ccc;
+    color:#fff;
+    // border:1px solid #ccc;
+    cursor: default;
+    &:hover{
+      color:#fff;
+      background:#ccc;
+      border:1px solid #ccc;
+    }
+  }
+  &.btn-black{
+     background:#444;
+     color:#fff;
+     &:hover{
+       background:#2c2c2c;
+     }
+   }
+  &.btn-yellow{
+    background:#f99d0b;
+    color:#fff;
+    &:hover{
+      background:#e99002;
+    }
+  }
+
+  &.btn-sm{
+    padding:0 20px;
+    line-height:28px;
+  }
+  &.btn-md{
+    width:120px;
+    height:40px;
+    line-height:40px;
+  }
+  &.btn-big{
+    font-size: 20px;
+    width:280px;
+    height:60px;
+    line-height:60px;
+  }
+  &.btn-form{
+    height:40px;
+    width:340px;
+    line-height:40px;
+  }
+  &.btn-lg{
+    height:40px;
+    width:100%;
+    line-height:40px;
+  }
+}
